@@ -1,8 +1,8 @@
-const createTable = async (pool) => {
+const createTable = async (pool, tableName) => {
     console.log('createTable');
     try {
         await pool.query(`
-            CREATE TABLE social (
+            CREATE TABLE ${tableName} (
                 id serial NOT NULL, 
                 name VARCHAR(50), 
                 email VARCHAR(50)
@@ -15,11 +15,17 @@ const createTable = async (pool) => {
     }
 }
 
-const insertData = async (pool) => {
+const insertData = async (pool, payload, tableName) => {
     console.log('insertData');
     try {
         await pool.query('BEGIN');
-        await pool.query("INSERT INTO social (name, email) VALUES('eu', 'eu@eumesmo.com')");
+        await pool.query(`
+            INSERT INTO ${tableName} (name, email) 
+            VALUES(
+                '${payload.name}', 
+                '${payload.email}'
+            )
+        `);
         await pool.query('COMMIT');
         return true;
     } catch(err) {
@@ -41,9 +47,16 @@ const main = async () => {
         port: 5432
     });
 
-    if (!(await insertData(pool))) {
-        if (await createTable(pool)) {
-            await insertData(pool);
+    const tableName = 'table1';
+
+    const payload = {
+        name: 'Iam',
+        email: 'myself@meyself.com'
+    };
+
+    if (!(await insertData(pool, payload, tableName))) {
+        if (await createTable(pool, tableName)) {
+            await insertData(pool, payload, tableName);
         }
     }
 
