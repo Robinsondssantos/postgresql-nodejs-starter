@@ -5,7 +5,8 @@ const createTable = async (pool, tableName) => {
             CREATE TABLE ${tableName} (
                 id serial NOT NULL, 
                 name VARCHAR(50), 
-                email VARCHAR(50)
+                email VARCHAR(50),
+                created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
             )
         `);
         return true;
